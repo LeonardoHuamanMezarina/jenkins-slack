@@ -50,25 +50,21 @@ pipeline {
         }
         success {
             echo '¡El Pipeline se ejecutó exitosamente en Jenkins!'
-            /* 
-              Cuando configuremos Slack, aquí añadiremos:
-              slackSend(
-                  channel: '#nombre-canal',
-                  color: 'good',
-                  message: "SUCCESS: Build #${env.BUILD_NUMBER} de ${env.JOB_NAME} (${env.BUILD_URL})"
-              )
-            */
+            slackSend(
+                channel: 'noti-jenkins',
+                color: '#36a64f',
+                tokenCredentialId: 'slack-token',
+                message: "✅ *Build Exitoso* en Jenkins!\n*Proyecto:* ${env.JOB_NAME} | *Build #:* ${env.BUILD_NUMBER}\n*Rama:* main | *Calculadora y Pruebas Unitarias:* OK\n*Detalles:* <${env.BUILD_URL}|Ver ejecución en Jenkins>"
+            )
         }
         failure {
             echo '¡Hubo un error en la ejecución del Pipeline!'
-            /* 
-              Cuando configuremos Slack, aquí añadiremos:
-              slackSend(
-                  channel: '#nombre-canal',
-                  color: 'danger',
-                  message: "FAILED: Build #${env.BUILD_NUMBER} de ${env.JOB_NAME} (${env.BUILD_URL})"
-              )
-            */
+            slackSend(
+                channel: 'noti-jenkins',
+                color: '#ff0000',
+                tokenCredentialId: 'slack-token',
+                message: "❌ *Build Fallido* en Jenkins!\n*Proyecto:* ${env.JOB_NAME} | *Build #:* ${env.BUILD_NUMBER}\n*Rama:* main\n*Detalles:* <${env.BUILD_URL}|Revisar logs en Jenkins>"
+            )
         }
     }
 }
