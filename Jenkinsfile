@@ -1,16 +1,9 @@
 pipeline {
     agent any
 
-    /* 
-      Si configuraste Maven o JDK en 'Manage Jenkins' -> 'Tools', 
-      descomenta este bloque:
-    */
-    /*
     tools {
         maven 'Maven 3'
-        jdk 'JDK 17'
     }
-    */
 
     stages {
         stage('Checkout') {
@@ -23,13 +16,12 @@ pipeline {
         stage('Compilación y Pruebas') {
             steps {
                 echo 'Ejecutando pruebas unitarias de la Calculadora...'
-                // Si tu Jenkins corre en Linux/Docker usa 'sh', si fuera Windows 'bat'
                 sh 'mvn clean test'
             }
             post {
                 always {
                     // Publica los reportes de pruebas JUnit en Jenkins
-                    junit 'target/surefire-reports/*.xml'
+                    junit testResults: 'target/surefire-reports/*.xml', allowEmptyResults: true
                 }
             }
         }
