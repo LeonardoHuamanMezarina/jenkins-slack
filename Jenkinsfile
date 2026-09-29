@@ -10,6 +10,10 @@ pipeline {
         pollSCM('H/2 * * * *')
     }
 
+    environment {
+        SLACK_WEBHOOK = credentials('slack-webhook')
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -50,23 +54,19 @@ pipeline {
         }
         success {
             echo '¡El Pipeline se ejecutó exitosamente en Jenkins!'
-            slackSend(
-                channel: 'noti-jenkins',
-                color: '#36a64f',
-                botUser: true,
-                tokenCredentialId: 'slack-token',
-                message: "✅ *Build Exitoso* en Jenkins!\n*Proyecto:* ${env.JOB_NAME} | *Build #:* ${env.BUILD_NUMBER}\n*Rama:* main | *Calculadora y Pruebas Unitarias:* OK\n*Detalles:* <${env.BUILD_URL}|Ver ejecución en Jenkins>"
-            )
+            sh '''
+                curl -s -X POST -H 'Content-type: application/json' \
+                --data '{"attachments":[{"color":"#36a64f","title":"✅ Build Exitoso en Jenkins","title_link":"'"${BUILD_URL}"'","text":"*Proyecto:* '"${JOB_NAME}"' | *Build #:* '"${BUILD_NUMBER}"'\\n*Rama:* main | *Calculadora y Pruebas Unitarias:* OK\\n<'"${BUILD_URL}"'|Ver ejecución en Jenkins>"}]}' \
+                "$SLACK_WEBHOOK"
+            '''
         }
         failure {
             echo '¡Hubo un error en la ejecución del Pipeline!'
-            slackSend(
-                channel: 'noti-jenkins',
-                color: '#ff0000',
-                botUser: true,
-                tokenCredentialId: 'slack-token',
-                message: "❌ *Build Fallido* en Jenkins!\n*Proyecto:* ${env.JOB_NAME} | *Build #:* ${env.BUILD_NUMBER}\n*Rama:* main\n*Detalles:* <${env.BUILD_URL}|Revisar logs en Jenkins>"
-            )
+            sh '''
+                curl -s -X POST -H 'Content-type: application/json' \
+                --data '{"attachments":[{"color":"#ff0000","title":"❌ Build Fallido en Jenkins","title_link":"'"${BUILD_URL}"'","text":"*Proyecto:* '"${JOB_NAME}"' | *Build #:* '"${BUILD_NUMBER}"'\\n*Rama:* main\\n<'"${BUILD_URL}"'|Revisar logs en Jenkins>"}]}' \
+                "$SLACK_WEBHOOK"
+            '''
         }
     }
 }
