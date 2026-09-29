@@ -10,10 +10,6 @@ pipeline {
         pollSCM('H/2 * * * *')
     }
 
-    environment {
-        SLACK_WEBHOOK = credentials('slack-webhook')
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -54,19 +50,23 @@ pipeline {
         }
         success {
             echo '¡El Pipeline se ejecutó exitosamente en Jenkins!'
-            sh '''
-                curl -s -X POST -H 'Content-type: application/json' \
-                --data '{"attachments":[{"color":"#36a64f","title":"✅ Build Exitoso en Jenkins","title_link":"'"${BUILD_URL}"'","text":"*Proyecto:* '"${JOB_NAME}"' | *Build #:* '"${BUILD_NUMBER}"'\\n*Rama:* main | *Calculadora y Pruebas Unitarias:* OK\\n<'"${BUILD_URL}"'|Ver ejecución en Jenkins>"}]}' \
-                "$SLACK_WEBHOOK"
-            '''
+            withCredentials([string(credentialsId: 'slack-webhook', variable: 'WEBHOOK_URL')]) {
+                sh '''
+                    curl -s -X POST -H 'Content-type: application/json' \
+                    --data '{"attachments":[{"color":"#36a64f","title":"✅ Build Exitoso en Jenkins","title_link":"'"${BUILD_URL}"'","text":"*Proyecto:* '"${JOB_NAME}"' | *Build #:* '"${BUILD_NUMBER}"'\\n*Rama:* main | *Calculadora y Pruebas Unitarias:* OK\\n<'"${BUILD_URL}"'|Ver ejecución en Jenkins>"}]}' \
+                    "$WEBHOOK_URL"
+                '''
+            }
         }
         failure {
             echo '¡Hubo un error en la ejecución del Pipeline!'
-            sh '''
-                curl -s -X POST -H 'Content-type: application/json' \
-                --data '{"attachments":[{"color":"#ff0000","title":"❌ Build Fallido en Jenkins","title_link":"'"${BUILD_URL}"'","text":"*Proyecto:* '"${JOB_NAME}"' | *Build #:* '"${BUILD_NUMBER}"'\\n*Rama:* main\\n<'"${BUILD_URL}"'|Revisar logs en Jenkins>"}]}' \
-                "$SLACK_WEBHOOK"
-            '''
+            withCredentials([string(credentialsId: 'slack-webhook', variable: 'WEBHOOK_URL')]) {
+                sh '''
+                    curl -s -X POST -H 'Content-type: application/json' \
+                    --data '{"attachments":[{"color":"#ff0000","title":"❌ Build Fallido en Jenkins","title_link":"'"${BUILD_URL}"'","text":"*Proyecto:* '"${JOB_NAME}"' | *Build #:* '"${BUILD_NUMBER}"'\\n*Rama:* main\\n<'"${BUILD_URL}"'|Revisar logs en Jenkins>"}]}' \
+                    "$WEBHOOK_URL"
+                '''
+            }
         }
     }
 }
