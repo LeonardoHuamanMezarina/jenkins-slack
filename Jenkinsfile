@@ -5,6 +5,11 @@ pipeline {
         maven 'Maven3'
     }
 
+    triggers {
+        // Revisa GitHub automáticamente cada 2 minutos; si hay nuevo push, se ejecuta solo
+        pollSCM('H/2 * * * *')
+    }
+
     stages {
         stage('Checkout') {
             steps {
