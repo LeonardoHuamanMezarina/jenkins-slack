@@ -53,6 +53,7 @@ pipeline {
             slackSend(
                 channel: 'noti-jenkins',
                 color: '#36a64f',
+                botUser: true,
                 tokenCredentialId: 'slack-token',
                 message: "✅ *Build Exitoso* en Jenkins!\n*Proyecto:* ${env.JOB_NAME} | *Build #:* ${env.BUILD_NUMBER}\n*Rama:* main | *Calculadora y Pruebas Unitarias:* OK\n*Detalles:* <${env.BUILD_URL}|Ver ejecución en Jenkins>"
             )
@@ -62,6 +63,7 @@ pipeline {
             slackSend(
                 channel: 'noti-jenkins',
                 color: '#ff0000',
+                botUser: true,
                 tokenCredentialId: 'slack-token',
                 message: "❌ *Build Fallido* en Jenkins!\n*Proyecto:* ${env.JOB_NAME} | *Build #:* ${env.BUILD_NUMBER}\n*Rama:* main\n*Detalles:* <${env.BUILD_URL}|Revisar logs en Jenkins>"
             )
