@@ -67,4 +67,15 @@ public class CalculatorTest {
     void testParameterizedAdd(double a, double b, double expected) {
         assertEquals(expected, calculator.add(a, b), 0.0001);
     }
+
+    @Test
+    @DisplayName("Fallo intencional para probar el post failure de Jenkins")
+    void testIntentionalFailureForJenkins() {
+        assertEquals(
+                5.0,
+                calculator.add(2.0, 2.0),
+                0.0001,
+                "Fallo intencional para verificar la notificacion de Jenkins"
+        );
+    }
 }
